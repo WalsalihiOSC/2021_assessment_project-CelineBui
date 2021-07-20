@@ -28,6 +28,7 @@ class welcome_win(Frame):
 
 
 root = Tk()
+welcome_window(root)
 root.title("Ormiston Computing")
 root.mainloop()
 
