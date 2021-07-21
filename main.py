@@ -78,9 +78,10 @@ class scoreboard_win(Frame):
 
         self.label = Label(self.frame, text="Your score is: ")
         self.label.grid(row=0)
-        self.box = LabelFrame(self.frame, width=50)
-        self.box.grid(row=1)
-        self.score_display = Label(self.frame, text="score variable")
+        self.box = Canvas(self.frame, width=50, height=50)
+        self.box.grid(row=1, padx=50)
+        self.score_display = Label(self.box, text="score variable")
+        self.score_display.grid()
         
         self.b1 = Button(self.frame, text="Retry", command=self.retry)
         self.b1.grid(row=3, column=1)
