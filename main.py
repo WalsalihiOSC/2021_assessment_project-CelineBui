@@ -1,6 +1,7 @@
 #Math programme for Ormiston primary students
 #By Celine Bui - Start: 12.07.21
 from tkinter import *
+from student import Student
 
 '''Frame 1 - Welcome page'''
 class welcome_win(Frame):
@@ -19,15 +20,28 @@ class welcome_win(Frame):
         self.name_input = Entry(self.frame, textvariable=self.sn)
         self.name_input.grid(column=0, row=0)
         
-        self.easy = Button(self.frame, text="Easy", command=self.store_info)
-        self.easy.grid(column=2, row=0)
-        self.medium = Button(self.frame, text="Kinda easy", command=self.store_info)
-        self.medium.grid(column=2, row=1)
-        self.hard = Button(self.frame, text= "Not so easy", command=self.store_info)
-        self.hard.grid(column=2, row=2)
+        Radiobutton(self.frame, 
+                    text="Easy", 
+                    value=0, #not to be confused with switching frame values for the whole programme
+                    variable=self.difficulty, #self.difficulty goes as if conditions into exercise_win
+                    command=self.store_info).grid(column=2, row=0)
+        Radiobutton(self.frame, 
+                    text="Kinda easy", 
+                    value=1, 
+                    variable=self.difficulty, 
+                    command=self.store_info).grid(column=2, row=1)
+        Radiobutton(self.frame, 
+                    text="Not so easy", 
+                    value=2, 
+                    variable=self.difficulty, 
+                    command=self.store_info).grid(column=2, row=2)
 
-    def store_info():
+    def check_info(self):
+        pass
+    
+    def store_info(self):
         #storing info when user clicks any of the difficulty level buttons to move forward
+        self.student = Student(self.name_input.get())
         pass
 
 
