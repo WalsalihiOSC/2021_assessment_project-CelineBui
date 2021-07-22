@@ -1,6 +1,6 @@
 #Math programme for Ormiston primary students
 #By Celine Bui - Start: 12.07.21
-from tkinter import * 
+from tkinter import *
 
 '''Frame 1 - Welcome page'''
 class welcome_win(Frame):
@@ -13,16 +13,17 @@ class welcome_win(Frame):
         #Frame
         self.frame = LabelFrame(master)
         self.frame.grid()
+        '''this frame might be unnecessary - fix later'''
 
         #Interface - blank fields and buttons
         self.name_input = Entry(self.frame, textvariable=self.sn)
         self.name_input.grid(column=0, row=0)
         
-        self.easy = Button(self.frame, text="Easy", command=quit)
+        self.easy = Button(self.frame, text="Easy", command=self.store_info)
         self.easy.grid(column=2, row=0)
-        self.medium = Button(self.frame, text="Kinda easy", command=quit)
+        self.medium = Button(self.frame, text="Kinda easy", command=self.store_info)
         self.medium.grid(column=2, row=1)
-        self.hard = Button(self.frame, text= "Not so easy", command=quit)
+        self.hard = Button(self.frame, text= "Not so easy", command=self.store_info)
         self.hard.grid(column=2, row=2)
 
     def store_info():
@@ -36,7 +37,7 @@ class exercise_win(Frame):
         Frame.__init__(self, master)
 
         #Interface design
-        self.frame = LabelFrame(master, background="yellow")
+        self.frame = LabelFrame(master, highlightbackground="yellow")
         self.frame.grid(column=0, row=0)
 
         #White container
@@ -68,12 +69,11 @@ class exercise_win(Frame):
 
 '''Frame 3 - Scoreboard page'''
 class scoreboard_win(Frame):
-    class scoreboard_win(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
 
         #Interface design
-        self.frame = LabelFrame(master, background="orange")
+        self.frame = LabelFrame(master, highlightbackground="orange")
         self.frame.grid(column=0, row=0)
 
         self.label = Label(self.frame, text="Your score is: ")
@@ -83,9 +83,11 @@ class scoreboard_win(Frame):
         self.score_display = Label(self.box, text="score variable")
         self.score_display.grid()
         
-        self.b1 = Button(self.frame, text="Retry", command=self.retry)
+        self.b1 = Button(self.frame, text="Retry")
+        self.b1['command'] = self.retry
         self.b1.grid(row=3, column=1)
-        self.b2 = Button(self.frame, text="New Player", command=self.new_player)
+        self.b2 = Button(self.frame, text="New Player")
+        self.b2['command'] = self.new_player
         self.b2.grid(row=3, column=2)
 
     def calculate_score():
@@ -97,9 +99,34 @@ class scoreboard_win(Frame):
     def new_player():
         pass
 
+'''Functions for switching between frames - Ref: https://www.pythontutorial.net/tkinter/tkraise/'''
+class SwitchFrame():
+    def __init__(self, container):
+        Frame.__init__(self, container)
+
+    # initialize frames
+        self.frames = {}
+        self.frames[0] = welcome_win(
+            container,
+            'Fahrenheit') #static method in class to be inserted here later?
+        self.frames[1] = exercise_win(
+            container,
+            'Celsius') #static method in class to be inserted here later?
+        self.frames[2] = scoreboard_win(
+            container,
+            'Celsius') #static method in class to be inserted here later?
+
+        self.change_frame()
+
+    def change_frame(self):
+        frame = self.frames[self.selected_value.get()] #self.selected_value - button with value corresponding with window is clicked
+        frame.reset()
+        frame.tkraise()
+
 
 root = Tk()
 scoreboard_win(root)
 root.title("Ormiston Computing")
+root.geometry('1000x500')
 root.mainloop()
 
