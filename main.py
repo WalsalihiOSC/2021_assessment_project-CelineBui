@@ -3,6 +3,26 @@
 from tkinter import *
 from student import Student
 
+'''this should go in exercise_win.py'''
+class QuestionGenerator: 
+    @staticmethod
+    def easy(a, format=True):
+        r = random.sample(range(0,100), 3)
+        if format:
+            return f'{r[1]} + {r[2]} - {r[3]} = ?'
+        if r[1] + r[2] - r[3] == a:
+            QuestionGenerator.easy()
+        return f' '
+
+    @staticmethod
+    def medium(a, format=True):
+        r = random.sample(range(0,1000), 3)
+        if format:
+            return f'{r[1]} x {r[2]} - {r[3]} = ?'
+        if r[1] * r[2] - r[3] == a:
+            QuestionGenerator.easy()
+        return f' '
+
 '''Frame 1 - Welcome page'''
 class welcome_win(Frame):
     def __init__(self, master=None):
