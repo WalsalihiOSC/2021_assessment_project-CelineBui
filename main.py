@@ -172,26 +172,21 @@ class scoreboard_win(Frame):
         pass
 
 '''Functions for switching between frames - Ref: https://www.pythontutorial.net/tkinter/tkraise/'''
-class SwitchFrame():
+#This is the main SwitchFrame function for the entire programme - need to see if works
+class SwitchFrame:
     def __init__(self, container):
-        Frame.__init__(self, container)
+        super().__init__(self, container)
 
     # initialize frames
-        self.frames = {}
-        self.frames[0] = welcome_win(
-            container,
-            'Fahrenheit') #static method in class to be inserted here later?
-        self.frames[1] = exercise_win(
-            container,
-            'Celsius') #static method in class to be inserted here later?
-        self.frames[2] = scoreboard_win(
-            container,
-            'Celsius') #static method in class to be inserted here later?
+        self.main_frames = {}
+        self.main_frames[0] = welcome_win(container) #static method in class to be inserted here later?
+        self.main_frames[1] = exercise_win(container)
+        self.main_frames[2] = scoreboard_win(container)
 
         self.change_frame()
 
     def change_frame(self):
-        frame = self.frames[self.selected_value.get()] #self.selected_value - button with value corresponding with window is clicked
+        frame = self.main_frames[self.selected_value.get()] #self.selected_value - button with value corresponding with window is clicked
         frame.reset()
         frame.tkraise()
 
