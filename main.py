@@ -63,7 +63,45 @@ class welcome_win(Frame):
         #storing info when user clicks any of the difficulty level buttons to move forward
         self.student = Student(self.name_input.get())
         pass
+    
+'''This class goes with the static methods - probably also into exercise_win'''
+'''welcome_win will have own version of ControlFrame for moving to the right exercise frame? + storing info'''
+class ControlFrame1(LabelFrame):
+    def __init__(self, container):
+        super().__init__(container)
+        self['text'] = 'Difficulty levels'
 
+        self.difficulty = IntVar()
+        Radiobutton(self, 
+                    text="Easy", 
+                    value=0, #not to be confused with switching frame values for the whole programme
+                    variable=self.difficulty, #self.difficulty goes as if conditions into exercise_win
+                    command=self.change_frame).grid(column=2, row=0)
+        Radiobutton(self, 
+                    text="Kinda easy", 
+                    value=1, 
+                    variable=self.difficulty, 
+                    command=self.change_frame).grid(column=2, row=1)
+        Radiobutton(self, 
+                    text="Not so easy", 
+                    value=2, 
+                    variable=self.difficulty, 
+                    command=self.change_frame).grid(column=2, row=2)
+
+        self.grid(column=1, row=0, sticky='ns')
+        #Intialise exercise frames transition
+        self.frames = {}
+
+        self.change_frame()
+
+    def change_frame(self):
+        self.student.append()
+        frame = self.frames[self.difficulty.get()]
+        frame.reset()
+        frame.tkraise()
+        
+        
+        
 
 '''Frame 2 - Exercise page'''
 class exercise_win(Frame):
