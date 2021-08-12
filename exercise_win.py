@@ -30,10 +30,10 @@ class ExerciseWindow(Frame):
                                 width=530, 
                                 height=290,
                                 background='#D0F6FC')
-        self.white.grid(column=0, 
-                        row=0, 
-                        padx=20, 
-                        pady=20)
+        self.white.grid(        column=0, 
+                                row=0, 
+                                padx=50, 
+                                pady=69)
         self.q = Label(self.white,
                         text="Auto-generated question")
         self.q.grid(row=0, column=0, columnspan=2, padx=100, pady=20)
@@ -43,12 +43,6 @@ class ExerciseWindow(Frame):
         self.a = IntVar()
         self.answer = Entry(self.white, textvariable=self.a)
         self.answer.grid(row=2, column=1, padx=(0, 100), pady=50)
-
-        self.sidebar = LabelFrame(self, background="blue", height=1000)
-        self.sidebar.grid(row=0, column=3, sticky=E)
-
-        self.nudge = Label(self.sidebar, text="Star is here to encourage you!")
-        self.nudge.grid(column=0, row=0, padx=20, pady=50)
 
         self.grid()
 
@@ -62,6 +56,15 @@ class ExerciseWindow(Frame):
         #For multiplication and division
         pass
 
+class SideBar(LabelFrame):
+    def __init__(self, container):
+        super().__init__(container, background='blue')
+
+        self.grid(row=0, column=3, sticky=E)
+
+        self.nudge = Label(self, text="Star is here to encourage you!")
+        self.nudge.grid(column=0, row=0, padx=25, pady=152)
+
 class ControlFrame:
     def __int__ (self):
         super().__init__(self)
@@ -70,5 +73,6 @@ root = Tk()
 root.title("Ormiston Computing")
 root.geometry("800x320")
 ExerciseWindow(root)
+SideBar(root)
 root.mainloop()
 
