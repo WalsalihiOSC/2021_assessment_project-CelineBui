@@ -57,24 +57,31 @@ class ExerciseWindow(Frame):
         self.grid()
 
     def question_generator(self):
-        i = 0
-        while i < 21:
-            self.q_num = Label(border=1, background="yellow", text=i)
-            self.r = random.sample(range(0,100), 3)
-            a = f'{self.r[0]} + {self.r[1]} - {self.r[2]} = ?'
-            self.check_answer()
-            i+=1
+        self.q_num = Label(self.white, 
+                           borderwidth=1, 
+                           background="yellow", 
+                           text="1")
+        self.q_num.grid(row=0, sticky=W)
+        self.r = random.sample(range(0,100), 3)
+        a = f'{self.r[0]} + {self.r[1]} - {self.r[2]} = ?'
         self.q = Label(self.white, background="#D0F6FC", text=a)
-        self.q.grid(row=0, column=0, columnspan=2, padx=200, pady=50)  
-    
-    def check_answer(self):
-        '''self.ans = int(self.answer.get())
+        self.q.grid(row=1, column=0, columnspan=2, padx=200, pady=50) 
+
+    def check_answer(self, event=None):
+        self.ans = int(self.answer.get())
         self.question = self.r[0] + self.r[1] - self.r[2]
         if self.ans == self.question:
             SideBar('Correct!')
-        else: SideBar('Incorrect!')'''
+        else: SideBar('Incorrect!')
         #Change input field into int
-        pass
+        self.next_q()
+        pass 
+
+    def next_q(self):
+        self.answer.delete(0, "end")
+        self.q.forget()
+        self.question_generator()
+
 
     def feedback(self):
         #For addition and subtraction 
