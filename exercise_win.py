@@ -36,6 +36,7 @@ class ExerciseWindow(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, background="blue")
         #White container
+        self.i = 0
         self.white = LabelFrame(self, 
                                 width=630, 
                                 height=300,
@@ -57,31 +58,42 @@ class ExerciseWindow(Frame):
         self.grid()
 
     def question_generator(self):
-        self.q_num = Label(self.white, 
-                           borderwidth=1, 
-                           background="yellow", 
-                           text="1")
-        self.q_num.grid(row=0, sticky=W)
         self.r = random.sample(range(0,100), 3)
         a = f'{self.r[0]} + {self.r[1]} - {self.r[2]} = ?'
         self.q = Label(self.white, background="#D0F6FC", text=a)
         self.q.grid(row=1, column=0, columnspan=2, padx=200, pady=50) 
 
     def check_answer(self, event=None):
+        def clicked():
+            self.i = self.i + 1
         self.ans = int(self.answer.get())
         self.question = self.r[0] + self.r[1] - self.r[2]
         if self.ans == self.question:
             SideBar('Correct!')
         else: SideBar('Incorrect!')
+        clicked()
+        self.q_num = Label(self.white, 
+                           borderwidth=1, 
+                           background="yellow", 
+                           text=self.i)
+        self.q_num.grid(row=0, sticky=W)
         #Change input field into int
-        self.next_q()
-        pass 
+        if self.i <= 20:
+            self.next_q()
+        else: self.complete()
 
     def next_q(self):
         self.answer.delete(0, "end")
         self.q.forget()
         self.question_generator()
 
+    def forget(widget):
+        widget.forget()
+    
+    def complete(self):
+        self.popup = Button(self.white, text="STOP!", command=lambda: self.forget(ExerciseWindow))
+        self.popup.grid()
+    
 
     def feedback(self):
         #For addition and subtraction 
