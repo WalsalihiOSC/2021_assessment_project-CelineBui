@@ -38,7 +38,7 @@ class Frame2(Frame):
         Frame.__init__ (self, master)
 
         self.frame_2 = ExerciseWindow(self)
-        self.subframe_2 = SideBar(self)
+        self.subframe_2 = SideBar(self, "Star is here to help you!")
         Button(self, text="STOP!", 
                             command=lambda: master.switch_frame(Frame3)).grid()
 
