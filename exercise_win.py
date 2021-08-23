@@ -87,27 +87,14 @@ class ExerciseWindow(Frame):
         self.q.forget()
         self.question_generator()
 
-    def forget(widget):
-        widget.forget()
-    
     def complete(self):
-        self.popup = Button(self.white, text="STOP!", command=lambda: self.forget(ExerciseWindow))
+        self.popup = Button(self.white, text="STOP!", command=quit)
         self.popup.grid()
+        #This is where the score calculations
+        #are stored into the student's data
     
 
     def feedback(self):
         #For addition and subtraction 
         #For multiplication and division
         pass
-
-class ControlFrame:
-    def __int__ (self):
-        super().__init__(self)
-
-root = Tk()
-root.title("Ormiston Computing")
-root.geometry("800x320")
-ExerciseWindow(root)
-SideBar(root)
-root.mainloop()
-
