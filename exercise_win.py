@@ -16,14 +16,23 @@ class QuestionGenerator:
     def medium(a, format=True):
         r = random.sample(range(0,1000), 3)
         if format:
+            return f'{r[1]} x {r[2]} ÷ {r[3]} = ?'
+        if r[1] * r[2] / r[3] == a:
+            QuestionGenerator.medium()
+        return f' ' 
+
+    @staticmethod
+    def hard(a, format=True):
+        r = random.sample(range(0,1000), 3)
+        if format:
             return f'{r[1]} x {r[2]} - {r[3]} = ?'
         if r[1] * r[2] - r[3] == a:
             QuestionGenerator.medium()
         return f' ' 
 
 class SideBar(Frame):
-    def __init__(self, a, master=None):
-        Frame.__init__(self, background="grey")
+    def __init__(self, master, a):
+        Frame.__init__(self, master, background="grey")
         
         self.box = LabelFrame(self, background="orange", width=240, height=350)
         self.box.grid()
@@ -33,10 +42,10 @@ class SideBar(Frame):
 
 '''Frame 2 - Exercise page'''
 class ExerciseWindow(Frame):
-    def __init__(self, master=None):
-        Frame.__init__(self, background="blue")
+    def __init__(self, master):
+        Frame.__init__(self, master, background="blue")
+
         #White container
-        self.i = 0
         self.white = LabelFrame(self, 
                                 width=630, 
                                 height=300,
@@ -51,47 +60,67 @@ class ExerciseWindow(Frame):
         self.label = Label(self.white, text="Answer: ")
         self.label.grid(row=2, column=0, padx=(100,0))
 
+        #Declaring score variable
+        self.score = 0
+
+        #Answer box
         self.a = IntVar()
         self.answer = Entry(self.white, textvariable=self.a)
         self.answer.grid(row=2, column=1, padx=(0, 100))
         self.question_generator()
         self.grid()
 
+        #Question number
+        self.i = 1
+        self.q_num = Label(self.white, 
+                           borderwidth=1, 
+                           background="yellow", 
+                           text=self.i)
+        self.q_num.grid(row=0, sticky=W)
+
     def question_generator(self):
+        #To be updated to work with staticmethods above
         self.r = random.sample(range(0,100), 3)
         a = f'{self.r[0]} + {self.r[1]} - {self.r[2]} = ?'
         self.q = Label(self.white, background="#D0F6FC", text=a)
         self.q.grid(row=1, column=0, columnspan=2, padx=200, pady=50) 
-
+    
     def check_answer(self, event=None):
         def clicked():
             self.i = self.i + 1
         self.ans = int(self.answer.get())
         self.question = self.r[0] + self.r[1] - self.r[2]
         if self.ans == self.question:
-            SideBar('Correct!')
-        else: SideBar('Incorrect!')
+            self.score += 1
+            SideBar(self, 'Correct!')
+        else: SideBar(self, 'Incorrect!')
         clicked()
-        self.q_num = Label(self.white, 
-                           borderwidth=1, 
-                           background="yellow", 
-                           text=self.i)
-        self.q_num.grid(row=0, sticky=W)
         #Change input field into int
-        if self.i <= 20:
+        if self.i <= 10:
+            self.calculate()
             self.next_q()
-        else: self.complete()
+        else: self.store_info()
+
+    def calculate(self):
+        
+        pass
 
     def next_q(self):
         self.answer.delete(0, "end")
         self.q.forget()
         self.question_generator()
 
-    def complete(self):
+    def reset(self):
+        SideBar.destroy()
+        ExerciseWindow.destroy()
+
+    def store_info(self):
+        
         self.popup = Button(self.white, text="STOP!", command=quit)
         self.popup.grid()
         #This is where the score calculations
         #are stored into the student's data
+        self.reset()
     
 
     def feedback(self):
