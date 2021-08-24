@@ -4,6 +4,7 @@ from tkinter import *
 from welcome_win import WelcomeWindow
 from exercise_win import ExerciseWindow, SideBar
 from scoreboard_win import ScoreboardWindow
+from student import Student
 
 '''Functions for switching between frames - Ref: https://www.pythontutorial.net/tkinter/tkraise/'''
 class SwitchFrame(Tk):
@@ -13,7 +14,7 @@ class SwitchFrame(Tk):
         self.switch_frame(Frame1)
 
         self.title("Ormiston Computing")
-        self.geometry('1000x500')
+        self.geometry('800x400')
         self.resizable(False, False)
 
     def switch_frame(self, frame_class):
@@ -25,13 +26,25 @@ class SwitchFrame(Tk):
     
 class Frame1(Frame):
     def __init__ (self, master):
-        Frame.__init__ (self, master)
-
-        self.frame_1 = WelcomeWindow(self)
+        Frame.__init__ (self, master, background="#f0f0f0")
+        self.frame_1 = WelcomeWindow(self) 
+        #Submit button
+        self.submit_bttn = Button(self.frame_1, text="Submit", command=self.submitted, highlightbackground="orange")
+        self.submit_bttn.grid(column=1, columnspan=2, row=7, ipadx=5, pady=(10,10))
         self.next = Button(self.frame_1, text="LET'S START!", 
-                            command=lambda: master.switch_frame(Frame2))
-        self.next.grid(column=0, row=0)             
-        self.frame_1.grid()
+                            command=lambda: master.switch_frame(Frame2),
+                            highlightbackground="#f0f0f0")
+
+    #Actual submit function is in WelcomeWindow
+    #The "Submit" button is to prompt the LET'S START button 
+    #in order to move to the next page
+    def submitted(self):
+        if self.frame_1.submit():
+            self.next.grid(column=1, row=7,
+                       columnspan=2, 
+                       pady=(10,10))
+                       
+        
 
 class Frame2(Frame):
     def __init__ (self, master):
