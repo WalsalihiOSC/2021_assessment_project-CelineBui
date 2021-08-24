@@ -6,9 +6,6 @@ class WelcomeWindow(Frame):
     def __init__(self, master):
         Frame.__init__(self, master, background="#f0f0f0")
         #Interface - blank fields and buttons
-
-        #Variable for when difficulty levels are chosen
-        self.chosen = 0
         #Logo
         self.im = Image.open('logo-ormmaths.png')
         self.resize = self.im.resize((200, 85), Image.ANTIALIAS)
@@ -16,10 +13,6 @@ class WelcomeWindow(Frame):
         self.img = Label(self, bg="#f2f2f2", image=self.render, height=85, width=170, padx=10)
         self.img.image = self.render
         self.img.grid(column=0, row=2, columnspan=4, sticky=S, ipadx=5, pady=(10,10))
-
-        #Submit button
-        self.submit_bttn = Button(self, text="Submit", command=self.submit, highlightbackground="orange")
-        self.submit_bttn.grid(column=1, columnspan=2, row=4, pady=(50,10))
         
         #Entry boxes
         #Code ref for working with textvariable: https://www.geeksforgeeks.org/python-tkinter-entry-widget/
@@ -68,10 +61,16 @@ class WelcomeWindow(Frame):
         self.grid()
 
     def store_info(self):
-        #storing info when user clicks any of the difficulty level buttons to move forward
-        Student.attr_list.append((self.name, self.year, self.diff_lvl))
-        print(self.sn.get(), self.yr.get(), self.diff_value.get(), self.diff_lvl)
-        return True
+        if len(Student.attr_list) != 0: #Clear list if user clicks differnt diff level
+            Student.attr_list.append((self.name, self.year, self.diff_lvl))
+            print(self.name, self.year, self.diff_lvl)
+            print(Student.attr_list)
+            print(len(Student.attr_list))
+            return True
+        else: 
+            Student.attr_list = []
+            return False
+        
     
     def check_info(self):
         self.input_check = 1
@@ -88,17 +87,17 @@ class WelcomeWindow(Frame):
         try:
             sy_number = int(self.year)
         except ValueError:
-            Label(self, text="Enter whole numbers", fg="red", bg="#f0f0f0",).grid(column=2, row=4)  
+            Label(self, text="You must be in Year 1 to Year 6.", fg="red").grid(column=3, row=4)  
             self.input_check = 0
         if sy_number < 1 or sy_number > 6:
-            Label(self, text="You must be in Year 1 to Year 6.", fg="red", bg="#f0f0f0", font="Times 14").grid(column=2, row=4)
+            Label(self, text="You must be in Year 1 to Year 6.", fg="red", bg="#f0f0f0", font="Times 14").grid(column=3, row=4)
             self.input_check = 0
 
         if self.input_check == 1:
             self.store_info()
 
     def conf_message(self, a):
-        Label(self, text=f"You've chosen\n{a} mode!").grid(column=1, columnspan=2,
+        Label(self, text=f"You've chosen\n{a} mode!").grid(column=2, columnspan=2,
                                                           row=4, 
                                                           ipadx=10, 
                                                           pady=(20,0))
@@ -117,7 +116,6 @@ class WelcomeWindow(Frame):
         elif self.diff_value.get() == 103:
             self.conf_message("Not so easy")
             self.diff_lvl = "Not so easy"
-        self.chosen = 1
         self.check_info()
         return self.diff_lvl
 
