@@ -58,7 +58,7 @@ class WelcomeWindow(Frame):
         self.grid()
 
     def store_info(self):
-        if len(Student.attr_list) == 0: #Clear list if user clicks differnt diff level
+        if len(Student.attr_list) == 0:
             Student.attr_list.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
             print(Student.attr_list)
             print(len(Student.attr_list))
