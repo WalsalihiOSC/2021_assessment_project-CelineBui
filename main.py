@@ -29,8 +29,15 @@ class Frame1(Frame):
         Frame.__init__ (self, master, background="#f0f0f0")
         self.frame_1 = WelcomeWindow(self) 
         #Submit button
-        self.submit_bttn = Button(self.frame_1, text="Submit", command=self.submitted, highlightbackground="orange")
-        self.submit_bttn.grid(column=1, columnspan=2, row=7, ipadx=5, pady=(10,10))
+        self.submit_bttn = Button(self.frame_1, 
+                                  text="Submit", 
+                                  command=self.submitted, 
+                                  highlightbackground="orange")
+        self.submit_bttn.grid(column=1, 
+                              columnspan=2, 
+                              row=7, 
+                              ipadx=5, 
+                              pady=(10,10))
         self.next = Button(self.frame_1, text="LET'S START!", 
                             command=lambda: master.switch_frame(Frame2),
                             highlightbackground="#f0f0f0")
@@ -39,12 +46,10 @@ class Frame1(Frame):
     #The "Submit" button is to prompt the LET'S START button 
     #in order to move to the next page
     def submitted(self):
-        if self.frame_1.submit():
+        if self.frame_1.submit() and self.frame_1.store_info():
             self.next.grid(column=1, row=7,
                        columnspan=2, 
-                       pady=(10,10))
-                       
-        
+                       pady=(10,10)) 
 
 class Frame2(Frame):
     def __init__ (self, master):
@@ -52,11 +57,30 @@ class Frame2(Frame):
 
         self.frame_2 = ExerciseWindow(self)
         self.subframe_2 = SideBar(self, "Star is here to help you!")
-        Button(self, text="STOP!", 
-                            command=lambda: master.switch_frame(Frame3)).grid()
-
+        #Same function as Frame1's button
+        self.done_bttn = Button(self.frame_2, 
+                                text="DONE", 
+                                command=self.submitted,
+                                highlightbackground="orange")
+        self.done_bttn.grid(column=0, row=4,
+                            columnspan=2, 
+                            ipadx=5,
+                            ipady=5)
+        self.next = Button(self.frame_2, text="DONE2", highlightbackground="#D0F6FC",
+                            command=lambda: master.switch_frame(Frame3))
         self.frame_2.grid()
         self.subframe_2.grid()
+
+    def submitted(self):
+        if len(Student.attr_list) == 3:
+            self.q = 10 - self.frame_2.i
+            SideBar(self, f"You have {self.q} questions left!")
+        elif len(Student.attr_list) == 4:
+            self.done_bttn.destroy()
+            self.next.grid(column=0, row=4,
+                           columnspan=2, 
+                           ipadx=5,
+                           ipady=5) 
 
 class Frame3(Frame):
     def __init__(self, master):
