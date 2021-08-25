@@ -97,9 +97,11 @@ class ExerciseWindow(Frame):
         elif self.ans == self.question:
             self.score += 1
             SideBar(self, 'Correct!')
+            print(self.i, "Correct")
             return True
         else: 
             SideBar(self, 'Incorrect!')
+            print(self.i, "Incorrect!")
             return True
         
 
@@ -115,17 +117,18 @@ class ExerciseWindow(Frame):
         ExerciseWindow.destroy()
 
     def clicked(self):
-        if self.check_answer() and self.i <= 10:
+        #If self.i = 10 then self.i will not be added 1 - questions stop at 10
+        if self.i <= 9 and self.check_answer():
             self.i = self.i + 1
-            self.next_q()
-        elif self.i > 10: 
+            if self.i < 10:
+                self.next_q()
+        elif self.check_answer() and self.i >= 10: 
             #disabling entry box and submit button
             #after the 10th question
             self.answer["state"] = "disabled"
             self.submit["state"] = "disabled"
             self.store_info()
             
-
     def question_count(self):
         #Question number
         self.q_num = Label(self.white, 
@@ -133,8 +136,7 @@ class ExerciseWindow(Frame):
                            background="yellow", 
                            text=self.i)
         self.q_num.grid(row=0, sticky=W)
-        if self.i > 10:
-            self.q_num.destroy()
+    
 
     def store_info(self):
         if len(Student.attr_list) == 3:
@@ -142,8 +144,6 @@ class ExerciseWindow(Frame):
             print(Student.attr_list)
             return True
         elif len(Student.attr_list) == 0: 
-            Student.attr_list.extend([f"Testing {self.score}/10"])
-            print(Student.attr_list)
             return False
         return True
         #This is where the score calculations
