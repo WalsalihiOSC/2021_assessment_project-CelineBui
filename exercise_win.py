@@ -1,4 +1,5 @@
 from tkinter import *
+from student import Student
 import random
 
 '''this should go in exercise_win.py'''
@@ -44,7 +45,6 @@ class SideBar(Frame):
 class ExerciseWindow(Frame):
     def __init__(self, master):
         Frame.__init__(self, master, background="blue")
-
         #White container
         self.white = LabelFrame(self, 
                                 width=630, 
@@ -54,14 +54,11 @@ class ExerciseWindow(Frame):
                                 row=0, 
                                 padx=30, 
                                 pady=(33, 100))
-        self.submit = Button(self.white,
-                             text="Submit", command=self.check_answer)
-        self.submit.grid(row=3, column=0, columnspan=2, padx=180, pady=(20,20))
-        self.label = Label(self.white, text="Answer: ")
-        self.label.grid(row=2, column=0, padx=(100,0))
 
-        #Declaring score variable
-        self.score = 0
+        #Declaring question counter
+        self.i = 1
+        #for question number to show up as soon as Frame2 initiates
+        self.question_count()
 
         #Answer box
         self.a = IntVar()
@@ -70,14 +67,16 @@ class ExerciseWindow(Frame):
         self.question_generator()
         self.grid()
 
-        #Question number
-        self.i = 1
-        self.q_num = Label(self.white, 
-                           borderwidth=1, 
-                           background="yellow", 
-                           text=self.i)
-        self.q_num.grid(row=0, sticky=W)
+        #Declaring score variable
+        self.score = 0
 
+        #Submit button
+        self.submit = Button(self.white,
+                             text="Submit", command=lambda:[self.clicked(), self.question_count()])
+        self.submit.grid(row=3, column=0, columnspan=2, padx=180, pady=(20,20))
+        self.label = Label(self.white, text="Answer: ")
+        self.label.grid(row=2, column=0, padx=(100,0))
+    
     def question_generator(self):
         #To be updated to work with staticmethods above
         self.r = random.sample(range(0,100), 3)
@@ -86,24 +85,16 @@ class ExerciseWindow(Frame):
         self.q.grid(row=1, column=0, columnspan=2, padx=200, pady=50) 
     
     def check_answer(self, event=None):
-        def clicked():
-            self.i = self.i + 1
-        self.ans = int(self.answer.get())
+        try:
+            self.ans = int(self.a.get())
+        except TclError and ValueError:
+            SideBar(self, "Please enter a number!")
         self.question = self.r[0] + self.r[1] - self.r[2]
         if self.ans == self.question:
             self.score += 1
             SideBar(self, 'Correct!')
         else: SideBar(self, 'Incorrect!')
-        clicked()
-        #Change input field into int
-        if self.i <= 10:
-            self.calculate()
-            self.next_q()
-        else: self.store_info()
-
-    def calculate(self):
         
-        pass
 
     def next_q(self):
         self.answer.delete(0, "end")
@@ -114,16 +105,44 @@ class ExerciseWindow(Frame):
         SideBar.destroy()
         ExerciseWindow.destroy()
 
+    def clicked(self):
+        self.i = self.i + 1
+        if self.i <= 10:
+            self.check_answer()
+            self.next_q()
+        else: 
+            Button(self.white,
+                   text="DONE",
+                   command=self.store_info).grid(row=3,
+                                                 column=0,
+                                                 columnspan=2,
+                                                 ipadx=5, ipady=5)
+            
+
+    def question_count(self):
+        #Question number
+        self.q_num = Label(self.white, 
+                           borderwidth=1, 
+                           background="yellow", 
+                           text=self.i)
+        self.q_num.grid(row=0, sticky=W)
+
     def store_info(self):
-        
-        self.popup = Button(self.white, text="STOP!", command=quit)
-        self.popup.grid()
+        if len(Student.attr_list) == 3:
+            Student.attr_list.extend([f"{self.score}/10"])
+        else: Student.attr_list.extend([f"Testing {self.score}/10"])
+        print(Student.attr_list)
         #This is where the score calculations
         #are stored into the student's data
-        self.reset()
+        return True
     
-
     def feedback(self):
         #For addition and subtraction 
         #For multiplication and division
         pass
+
+'''root = Tk()
+root.geometry('800x400')
+ExerciseWindow(root)
+SideBar(root, "Star is here to help!")
+root.mainloop()'''
