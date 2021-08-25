@@ -86,17 +86,26 @@ class ExerciseWindow(Frame):
     
     def check_answer(self, event=None):
         try:
-            self.ans = int(self.a.get())
-        except TclError and ValueError:
+            self.ans = float(self.a.get())
+        except ValueError:
             SideBar(self, "Please enter a number!")
+            return False
         self.question = self.r[0] + self.r[1] - self.r[2]
-        if self.ans == self.question:
+        if self.ans == "":
+            SideBar(self, "Don't leave blanks!")
+            return False
+        elif self.ans == self.question:
             self.score += 1
             SideBar(self, 'Correct!')
-        else: SideBar(self, 'Incorrect!')
+            return True
+        else: 
+            SideBar(self, 'Incorrect!')
+            return True
         
 
     def next_q(self):
+        #delete text in entry box when click submit
+        #to move on to next question
         self.answer.delete(0, "end")
         self.q.forget()
         self.question_generator()
@@ -106,17 +115,15 @@ class ExerciseWindow(Frame):
         ExerciseWindow.destroy()
 
     def clicked(self):
-        self.i = self.i + 1
-        if self.i <= 10:
-            self.check_answer()
+        if self.check_answer() and self.i <= 10:
+            self.i = self.i + 1
             self.next_q()
-        else: 
-            Button(self.white,
-                   text="DONE",
-                   command=self.store_info).grid(row=3,
-                                                 column=0,
-                                                 columnspan=2,
-                                                 ipadx=5, ipady=5)
+        elif self.i > 10: 
+            #disabling entry box and submit button
+            #after the 10th question
+            self.answer["state"] = "disabled"
+            self.submit["state"] = "disabled"
+            self.store_info()
             
 
     def question_count(self):
@@ -126,23 +133,23 @@ class ExerciseWindow(Frame):
                            background="yellow", 
                            text=self.i)
         self.q_num.grid(row=0, sticky=W)
+        if self.i > 10:
+            self.q_num.destroy()
 
     def store_info(self):
         if len(Student.attr_list) == 3:
             Student.attr_list.extend([f"{self.score}/10"])
-        else: Student.attr_list.extend([f"Testing {self.score}/10"])
-        print(Student.attr_list)
+            print(Student.attr_list)
+            return True
+        elif len(Student.attr_list) == 0: 
+            Student.attr_list.extend([f"Testing {self.score}/10"])
+            print(Student.attr_list)
+            return False
+        return True
         #This is where the score calculations
         #are stored into the student's data
-        return True
     
     def feedback(self):
         #For addition and subtraction 
         #For multiplication and division
         pass
-
-'''root = Tk()
-root.geometry('800x400')
-ExerciseWindow(root)
-SideBar(root, "Star is here to help!")
-root.mainloop()'''
