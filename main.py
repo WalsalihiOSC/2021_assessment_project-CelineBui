@@ -66,7 +66,7 @@ class Frame2(Frame):
                             columnspan=2, 
                             ipadx=5,
                             ipady=5)
-        self.next = Button(self.frame_2, text="DONE2", highlightbackground="#D0F6FC",
+        self.next = Button(self.frame_2, text="YOUR SCORE!", highlightbackground="#D0F6FC",
                             command=lambda: master.switch_frame(Frame3))
         self.frame_2.grid()
         self.subframe_2.grid()
@@ -84,12 +84,59 @@ class Frame2(Frame):
 
 class Frame3(Frame):
     def __init__(self, master):
-        Frame.__init__(self, master)
-
+        Frame.__init__(self, master, background="#f0f0f0")
+        #Data encapsulation as soon as Frame3 initiates
+        self.name = Student.attr_list[0]
+        self.year = Student.attr_list[1]
+        self.level = Student.attr_list[2]
+        self.score = Student.attr_list[3]
+        self.student = Student(self.name, self.year, self.level, self.score)
+        #Print self.student object as a string.
+        #Code ref: https://www.educative.io/edpresso/what-is-the-str-method-in-python
+        print(self.student.__str__())
+        #frame
         self.frame_3 = ScoreboardWindow(self)
-        Button(self.frame_3, text="New Player",
-                command=lambda: master.switch_frame(Frame1)).grid()
-        self.frame_3.grid()
+        #buttons
+        self.b1 = Button(self.frame_3, text="Retry", highlightbackground="orange")
+        #Assign two functions to one button
+        #Code ref: https://www.delftstack.com/howto/python-tkinter/how-to-bind-multiple-commands-to-tkinter-button/
+        self.b1['command'] = lambda:[self.retry(), master.switch_frame(Frame2)]
+        self.b1.grid(row=4, 
+                     column=1, 
+                     padx=(50,100),
+                     ipadx=10,
+                     ipady=10,
+                     pady=(0, 150))
+
+        self.b2 = Button(self.frame_3, text="New Player", highlightbackground="yellow")
+        self.b2['command'] = lambda: [self.new_player(), master.switch_frame(Frame1)]
+        self.b2.grid(row=4, 
+                     column=3, 
+                     padx=(0, 300),
+                     ipadx=10,
+                     ipady=10,
+                     pady=(0, 150))
+
+    def retry(self):
+        #New score will become the score in the object's attribute scr
+        #However old score will not be erased from file
+        #New score is added with title "Second attempt"
+        #Code ref: https://www.programiz.com/python-programming/methods/list/pop 
+        Student.write_file(self.student)
+        self.retry_count = Student.retry_times
+        self.retry_count = self.retry_count + 1
+        self.score_2 = Student.attr_list.pop(3)
+        print(self.score_2)
+        print(len(Student.attr_list))
+        if len(Student.attr_list) == 4:
+            with open("students.txt", 'a', encoding = 'utf-8') as f: #file always closes even when operations unexpectedly fail
+                f.write(f"Attempt {self.retry_count}: {self.score}")
+    
+    def new_player(self):
+        #Only write to file if click new player
+        Student.write_file(self.student)
+        with open("students.txt", 'a', encoding = 'utf-8') as f: #file always closes even when operations unexpectedly fail
+            f.write(f"===========\n\n")
 
 if __name__ == "__main__":
     root = SwitchFrame()
