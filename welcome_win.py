@@ -28,6 +28,7 @@ class WelcomeWindow(Frame):
         self.yr = IntVar()
         self.year_level = Entry(self, textvariable=self.yr, borderwidth=3, width=15)
         self.year_level.insert(0, "Your year level?") 
+        #delete placeholder text when clicked
         self.year_level.bind("<FocusIn>", 
                                 lambda args: self.year_level.delete('0', 'end'))
         self.year_level.grid(column=2, columnspan=2, row=3, padx=(10, 250), pady=10)
@@ -45,7 +46,7 @@ class WelcomeWindow(Frame):
         for choice, val in choices:
             Radiobutton(self,
                         text = choice,
-                        indicatoron=0,
+                        indicatoron=0, #to transform checkbuttons into boxes
                         width=10,
                         height=3,
                         variable = self.diff_value,
@@ -55,23 +56,12 @@ class WelcomeWindow(Frame):
                                                      columnspan=2,
                                                      padx=(50,50), 
                                                      pady=(10,0))
+                                #self.submit refers to the numerical values in 'choices' list
+                                #to input text (e.g 'Easy') for the third item (diff_lvl) in attr_list
         self.grid()
-
-    def store_info(self):
-        if len(Student.attr_list) == 0:
-            Student.attr_list.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
-            print(Student.attr_list)
-            print(len(Student.attr_list))
-            return True
-        elif len(Student.attr_list) > 3: 
-            #if students choose a different diff lvl
-            #i.e clicking 'easy' and then click 'not so easy'
-            #Student.attr_list will be reset
-            Student.attr_list = []
-            return False
         
-    
-    def check_info(self, event=None):
+    #   Error labels
+    def errors(self, event=None):
         self.input_check = 1
         #Drawing value from entry boxes
         #Checking for blanks
@@ -95,16 +85,31 @@ class WelcomeWindow(Frame):
 
         if self.input_check == 1:
             self.store_info()
+    
+    def send_info(self):
+        if len(Student.attr_list) == 0:
+            Student.attr_list.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
+            Student.input_check(self) #Possible error
+            self.errors()
+            print(Student.attr_list)
+            print(len(Student.attr_list))
+            return True
+        elif len(Student.attr_list) > 3: 
+            Label(self, text="Unknown error. Please exit programme and reopen it.", 
+                  fg="red").grid(column=0, row=1)
+            Student.attr_list = []
+            return False
            
 
     def conf_message(self, a):
+        #Confirmation message pops up when user chooses difficulty level
         Label(self, text=f"You've chosen\n{a} mode!").grid(column=2, columnspan=2,
                                                           row=4, 
                                                           ipadx=10, 
                                                           pady=(20,0))
 
     def submit(self):
-        self.check_info()
+        self.send_info()
         '''if len(self.student) == 3:
             self.student[2] = None'''
         if self.diff_value.get() == 101:
