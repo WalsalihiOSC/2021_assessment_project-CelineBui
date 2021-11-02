@@ -1,10 +1,10 @@
 from tkinter import *
-from student import Student
+from student import Student, CheckingInput
 from PIL import Image, ImageTk
 
 class WelcomeWindow(Frame):
     def __init__(self, master):
-        Frame.__init__(self, master, background="#f0f0f0")
+        Frame.__init__(self, master, height=500, width=800, background="#f0f0f0")
         #Interface - blank fields and buttons
         #Logo
         self.im = Image.open('logo-ormmaths.png')
@@ -23,15 +23,16 @@ class WelcomeWindow(Frame):
         #delete placeholder text when clicked
         self.name_input.bind("<FocusIn>", 
                                 lambda args: self.name_input.delete('0', 'end')) 
-        self.name_input.grid(column=0, columnspan=2, row=3, padx=(200, 10), pady=10)
+        self.name_input.grid(column=0, columnspan=2, row=4, padx=(200, 10), pady=10) ########       FIX HERE!
         
-        self.yr = IntVar()
-        self.year_level = Entry(self, textvariable=self.yr, borderwidth=3, width=15)
-        self.year_level.insert(0, "Your year level?") 
+        #though declare as sringvar to avoid complications with placeholder text
+        #only string convertible to int var accepted through checking
+        self.yr = Entry(self, borderwidth=3, width=15)
+        self.yr.insert(0, "Your year level?") 
         #delete placeholder text when clicked
-        self.year_level.bind("<FocusIn>", 
-                                lambda args: self.year_level.delete('0', 'end'))
-        self.year_level.grid(column=2, columnspan=2, row=3, padx=(10, 250), pady=10)
+        self.yr.bind("<FocusIn>", 
+                    lambda args: self.yr.delete('0', 'end'))
+        self.yr.grid(column=2, columnspan=2, row=4, padx=(10, 250), pady=10) ########       FIX HERE!
         
 
         self.diff_value = IntVar()
@@ -48,10 +49,10 @@ class WelcomeWindow(Frame):
                         text = choice,
                         indicatoron=0, #to transform checkbuttons into boxes
                         width=10,
-                        height=3,
+                        height=2,
                         variable = self.diff_value,
                         value = val,
-                        command = self.submit).grid(column=1,
+                        command = self.choose_diff).grid(column=1,
                                                      sticky=N,
                                                      columnspan=2,
                                                      padx=(50,50), 
@@ -59,67 +60,95 @@ class WelcomeWindow(Frame):
                                 #self.submit refers to the numerical values in 'choices' list
                                 #to input text (e.g 'Easy') for the third item (diff_lvl) in attr_list
         self.grid()
-        
+
+    def store_info(self):
+        if len(Student.attr_list) == 0:
+            Student.attr_list.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
+            print("Accurate information stored:", Student.attr_list)
+            return True
+        else:
+            Student.attr_list = []
+            return False
+
     #   Error labels
     def errors(self, event=None):
         self.input_check = 1
+        self.err_message = 0
         #Drawing value from entry boxes
         #Checking for blanks
-        if len(self.sn.get()) == 0:
-            Label(self, text="Fill in your name!", fg="red").grid(column=0, row=4)
+        if self.sn.get() == '' or self.sn.get() == 'Tell us your name!':
+            self.err_1 = Label(self, text="Fill in your name!", fg="red", bg="#f0f0f0")
+            self.err_1.grid(column=0, columnspan=2,
+                       row=3, 
+                       padx=(200,0))
             self.input_check = 0
-        if self.yr.get() == "":
-            Label(self, text="Fill in your year level!", fg="red").grid(column=3, row=4)
+    
+        if self.yr.get() == '' or self.yr.get() == 'Your year level?':
+            self.err_2 = Label(self, text="Fill in your year level!", fg="red", bg="#f0f0f0")
+            self.err_2.grid(column=2, row=3,
+                            columnspan=2,
+                            padx=(10,250)
+                            )
             self.input_check = 0
+        
         #Invalids and boundaries - year level
-        try:
-            sy_number = int(self.yr.get())
-            return sy_number, True
-        except ValueError:
-            Label(self, text="You must be in Year 1 to Year 6.", fg="red").grid(column=3, row=4)  
+        if CheckingInput.invalid == 2 and self.yr.get() != 'Your year level?' and self.yr.get() != '':
+            self.err_3 = Label(self, text="Please write your year level\nin numbers.", fg="red", bg="#f0f0f0")
+            self.err_3.grid(column=2, columnspan=2,
+                            row=3, 
+                            padx=(10, 250))  
             self.input_check = 0
-
-        if self.yr.get() < 1 or self.yr.get() > 6:
-            Label(self, text="You must be in Year 1 to Year 6.", fg="red", bg="#f0f0f0").grid(column=3, row=4)
+            
+        if CheckingInput.invalid == 3:
+            self.err_4 = Label(self, text="You must be in\nYear 1 to Year 6.", fg="red", bg="#f0f0f0", width=18)
+            self.err_4.grid(column=2, row=3, columnspan=2, padx=(10,250))
             self.input_check = 0 
 
-        if self.input_check == 1:
+        if CheckingInput.invalid == 4:
+            self.err_5 = Label(self, text="Choose your\ndifficulty level!", fg='red', bg='#f0f0f0')
+            self.err_5.grid(column=2, row=6,
+                            columnspan=2,
+                            padx=(10,150))
+
+        if self.input_check == 0:
+            CheckingInput.check = []
+        elif self.input_check == 1 and CheckingInput.invalid == 0:
             self.store_info()
     
     def send_info(self):
-        if len(Student.attr_list) == 0:
-            Student.attr_list.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
-            Student.input_check(self) #Possible error
+        self.object = CheckingInput()
+        if len(CheckingInput.check) == 0:
+            CheckingInput.check.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
+            print('Step 1: Checking list', CheckingInput.check)
+            self.object.input_check()
             self.errors()
-            print(Student.attr_list)
-            print(len(Student.attr_list))
             return True
-        elif len(Student.attr_list) > 3: 
+        elif len(CheckingInput.check) > 3: 
             Label(self, text="Unknown error. Please exit programme and reopen it.", 
                   fg="red").grid(column=0, row=1)
             Student.attr_list = []
             return False
            
-
     def conf_message(self, a):
         #Confirmation message pops up when user chooses difficulty level
-        Label(self, text=f"You've chosen\n{a} mode!").grid(column=2, columnspan=2,
-                                                          row=4, 
-                                                          ipadx=10, 
-                                                          pady=(20,0))
+        Label(self, text=f"You've chosen\n{a} mode!", 
+              borderwidth=2, 
+              background="orange",
+              width=10,
+              height=2).grid(column=2, columnspan=2,
+                                        row=6, 
+                                        ipadx=10,
+                                        padx=(10,150))
 
-    def submit(self):
-        self.send_info()
-        '''if len(self.student) == 3:
-            self.student[2] = None'''
+    def choose_diff(self):
         if self.diff_value.get() == 101:
-            self.conf_message("Easy")
+            self.conf_message("EASY")
             self.diff_lvl = "Easy"
         elif self.diff_value.get() == 102:
-            self.conf_message("Kinda easy")
+            self.conf_message("MEDIUM")
             self.diff_lvl = "Kinda easy"
         elif self.diff_value.get() == 103:
-            self.conf_message("Not so easy")
+            self.conf_message("HARD")
             self.diff_lvl = "Not so easy"
         return self.diff_lvl
 
