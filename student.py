@@ -2,7 +2,6 @@ from tkinter import *
 
 class Student:
     attr_list = []  #List variable to append info as programme runs
-    invalid = 0
     #Declare retry variable at the student class
     #Student class does not restart even if player chooses retry
     retry_times = 0
@@ -10,33 +9,7 @@ class Student:
         self.student_name = sn
         self.year_level = yr
         self.diff_lvl = lvl
-        self.score = scr
-
-    def input_check(self):
-        #Assuming info has been stoed into attr_list list
-        if len(Student.attr_list) == 3: #3 attr of name, year and diff lvl
-            self.name = Student.attr_list[0]
-            self.year = Student.attr_list[1]
-            self.diff = Student.attr_list[2]
-            #Invalid checking
-            try:
-                sy_number = int(self.year)
-                return sy_number, True
-            except ValueError: #player used text instead of number for year lvl
-                Student.invalid = 2 
-                ''' 2 = text instead of num '''
-            
-            #Boundaries for year lvl
-            if self.scr < 1 or self.scr > 6: #Can only be students year 1-6
-                Student.invalid = 3
-                ''' 3 = invalid year level - boundaries '''
-            return True
-
-        elif len(Student.attr_list) < 3: #BLANKS - user did not input  info
-            Student.invalid = 1 
-            ''' 1 = all / some fields are blank -- return to interface to give error'''
-            return False
-        
+        self.score = scr     
         
     def class_obj(self):
         #Data encapsulation as soon as when final frame initiates - all attributes contain info
@@ -49,6 +22,55 @@ class Student:
         #No divider in the write text file to append additional info of later attempts
         with open("students.txt", 'a', encoding = 'utf-8') as f: #file always closes even when operations unexpectedly fail
             f.write(f"===========\nStudent's name: {self.student_name}\nDifficulty level: {self.diff_lvl}\nStudent's score: {self.score}\n")
+
+class CheckingInput:
+    check = [] #list used for communicating between instance and interface
+    invalid = 0
+    def __init__(self) -> None:
+        pass
+
+    def input_check(self):
+        #reset invalid variable
+        CheckingInput.invalid = 0
+        #Assuming info has been stoed into checking list
+        if len(CheckingInput.check) == 3: #3 attr of name, year and diff lvl
+            print(CheckingInput.check)
+            self.name = CheckingInput.check[0]
+            self.year = CheckingInput.check[1]
+            self.diff = CheckingInput.check[2]
+            print(type(self.year))
+            #Invalid checking
+            try:
+                self.year = int(CheckingInput.check[1])
+            except ValueError: #player used text instead of number for year lvl
+                CheckingInput.invalid = 2
+            except TclError:
+                CheckingInput.invalid = 2
+                ''' 2 = text instead of num '''
+            
+            #Boundaries for year lvl
+            if CheckingInput.invalid != 2:
+                self.year_lvl = int(CheckingInput.check[1])
+                if self.year_lvl < 1 or self.year_lvl > 6: #Can only be students year 1-6
+                    CheckingInput.invalid = 3
+                    print(CheckingInput.invalid)
+                    ''' 3 = invalid year level - boundaries '''
+            if self.diff != 'Easy':
+                if self.diff != 'Kinda easy':
+                    if self.diff != 'Not so easy':
+                        CheckingInput.invalid = 4
+                        ''' 4 = have not chosen diff lvl'''
+            return True
+
+        elif len(CheckingInput.check) < 3: #BLANKS - user did not input  info
+            CheckingInput.invalid = 1 
+            print(CheckingInput.invalid)
+            ''' 1 = all / some fields are blank -- return to interface to give error'''
+            return True
+
+        elif len(CheckingInput.check) > 3:
+            CheckingInput.check = []
+
 
 
     '''def retry(self):
