@@ -4,7 +4,7 @@ from tkinter import *
 from welcome_win import WelcomeWindow
 from exercise_win import ExerciseWindow, SideBar
 from scoreboard_win import ScoreboardWindow
-from student import Student
+from student import Student, CheckingInput
 
 '''Functions for switching between frames - Ref: https://www.pythontutorial.net/tkinter/tkraise/'''
 class SwitchFrame(Tk):
@@ -15,7 +15,7 @@ class SwitchFrame(Tk):
 
         self.title("Ormiston Computing")
         self.geometry('800x400')
-        self.resizable(False, False)
+        #self.resizable(False, False)
 
     def switch_frame(self, frame_class):
         new_frame = frame_class(self)
@@ -26,30 +26,38 @@ class SwitchFrame(Tk):
     
 class Frame1(Frame):
     def __init__ (self, master):
-        Frame.__init__ (self, master, background="#f0f0f0")
+        Frame.__init__ (self, master)
         self.frame_1 = WelcomeWindow(self) 
         #Submit button
         self.submit_bttn = Button(self.frame_1, 
                                   text="Submit", 
                                   command=self.submitted, 
-                                  highlightbackground="orange")
+                                  highlightbackground="orange"
+                                  )
         self.submit_bttn.grid(column=1, 
                               columnspan=2, 
-                              row=7, 
-                              ipadx=5, 
-                              pady=(10,10))
+                              row=10, 
+                              ipadx=5, ipady=5, 
+                              pady=(10,10)
+                              )
         self.next = Button(self.frame_1, text="LET'S START!", 
                             command=lambda: master.switch_frame(Frame2),
-                            highlightbackground="#f0f0f0")
+                            highlightbackground="orange", 
+                            activebackground="yellow")
+        
 
     #Actual submit function is in WelcomeWindow
     #The "Submit" button is to prompt the LET'S START button 
     #in order to move to the next page
     def submitted(self):
-        if self.frame_1.submit() and self.frame_1.store_info():
-            self.next.grid(column=1, row=7,
-                       columnspan=2, 
-                       pady=(10,10)) 
+        self.frame_1.send_info()
+        if self.frame_1.choose_diff() and len(Student.attr_list) == 3:
+            print("Double checking in main:", Student.attr_list)
+            self.submit_bttn.destroy()
+            self.next.grid(column=1, row=10,
+                           columnspan=2,
+                           ipady=5, ipadx=5,
+                           pady=(20,10))
 
 class Frame2(Frame):
     def __init__ (self, master):
@@ -62,7 +70,7 @@ class Frame2(Frame):
                                 text="DONE", 
                                 command=self.submitted,
                                 highlightbackground="orange")
-        self.done_bttn.grid(column=0, row=4,
+        self.done_bttn.grid(column=0, row=2,
                             columnspan=2, 
                             ipadx=5,
                             ipady=5)
@@ -72,12 +80,13 @@ class Frame2(Frame):
         self.subframe_2.grid()
 
     def submitted(self):
+        #for students to check progress when click done?
         if len(Student.attr_list) == 3:
             self.q = 10 - self.frame_2.i
             SideBar(self, f"You have {self.q} questions left!")
         elif len(Student.attr_list) == 4:
             self.done_bttn.destroy()
-            self.next.grid(column=0, row=4,
+            self.next.grid(column=0, row=2,
                            columnspan=2, 
                            ipadx=5,
                            ipady=5) 
@@ -85,22 +94,14 @@ class Frame2(Frame):
 class Frame3(Frame):
     def __init__(self, master):
         Frame.__init__(self, master, background="#f0f0f0")
-        #Data encapsulation as soon as Frame3 initiates
-        self.name = Student.attr_list[0]
-        self.year = Student.attr_list[1]
-        self.level = Student.attr_list[2]
-        self.score = Student.attr_list[3]
-        self.student = Student(self.name, self.year, self.level, self.score)
-        #Print self.student object as a string.
-        #Code ref: https://www.educative.io/edpresso/what-is-the-str-method-in-python
-        print(self.student.__str__())
+
         #frame
         self.frame_3 = ScoreboardWindow(self)
         #buttons
         self.b1 = Button(self.frame_3, text="Retry", highlightbackground="orange")
         #Assign two functions to one button
         #Code ref: https://www.delftstack.com/howto/python-tkinter/how-to-bind-multiple-commands-to-tkinter-button/
-        self.b1['command'] = lambda:[self.retry(), master.switch_frame(Frame2)]
+        self.b1['command'] = lambda:[Student.retry(), master.switch_frame(Frame2)]
         self.b1.grid(row=4, 
                      column=1, 
                      padx=(50,100),
@@ -109,7 +110,7 @@ class Frame3(Frame):
                      pady=(0, 150))
 
         self.b2 = Button(self.frame_3, text="New Player", highlightbackground="yellow")
-        self.b2['command'] = lambda: [self.new_player(), master.switch_frame(Frame1)]
+        self.b2['command'] = lambda: [Student.new_player(), master.switch_frame(Frame1)] #two combined commands in one button
         self.b2.grid(row=4, 
                      column=3, 
                      padx=(0, 300),
@@ -118,14 +119,14 @@ class Frame3(Frame):
                      pady=(0, 150))
 
     def retry(self):
-        #New score will become the score in the object's attribute scr
-        #However old score will not be erased from file
+        '''New score will become the score in the object's attribute scr
+        Old score will not be erased from file'''
         #New score is added with title "Second attempt"
         #Code ref: https://www.programiz.com/python-programming/methods/list/pop 
         Student.write_file(self.student)
         self.retry_count = Student.retry_times
         self.retry_count = self.retry_count + 1
-        self.score_2 = Student.attr_list.pop(3)
+        self.score_2 = Student.attr_list.pop(3) #new score replaces old 
         print(self.score_2)
         print(len(Student.attr_list))
         if len(Student.attr_list) == 4:
