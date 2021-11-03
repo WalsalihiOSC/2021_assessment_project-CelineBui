@@ -37,45 +37,21 @@ class ScoreboardWindow(Frame):
                       columnspan=3,
                       padx=(50,300),
                       pady=(0,50))
-        self.score_display = Label(self.box,
-                                   text="score variable", 
-                                   background="yellow",
-                                   height=5,
-                                   width=20)
-        self.score_display.grid()
-        
-        #buttons
-        self.b1 = Button(self, text="Retry")
-        self.b1['command'] = self.retry
-        self.b1.grid(row=4, 
-                     column=1, 
-                     padx=(50,100),
-                     ipadx=10,
-                     ipady=10,
-                     pady=(0, 150))
-
-        self.b2 = Button(self, text="New Player")
-        self.b2['command'] = self.new_player
-        self.b2.grid(row=4, 
-                     column=3, 
-                     padx=(0, 300),
-                     ipadx=10,
-                     ipady=10,
-                     pady=(0, 150))
+        self.a = StringVar()
+        self.scoreboard(self.a)
 
         self.grid()
 
-    def calculate_score(self):
-        pass
-
-    def retry(self):
-        
-        pass
-    
-    def new_player(self):
-        pass
-
-'''root = Tk()
-root.geometry('800x400')
-ScoreboardWindow(root)
-root.mainloop()'''
+    def scoreboard(self, a):
+        self.a = a
+        try: 
+            self.a = str(Student.attr_list[3])
+        except ValueError:
+            print("What?")
+        self.score_display = Label(self.box,
+                                   text=self.a, 
+                                   background="#D0F6FC",
+                                   font="Helvetica 30",
+                                   height=2,
+                                   width=10)
+        self.score_display.grid()
