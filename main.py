@@ -2,9 +2,9 @@
 #By Celine Bui - Start: 12.07.21
 from tkinter import *
 from welcome_win import WelcomeWindow
-from exercise_win import ExerciseWindow, SideBar
+from exercise_win import  ExerciseWindow, QuestionGenerator
 from scoreboard_win import ScoreboardWindow
-from student import Student, CheckingInput
+from student import Student
 
 '''Functions for switching between frames - Ref: https://www.pythontutorial.net/tkinter/tkraise/'''
 class SwitchFrame(Tk):
@@ -27,12 +27,15 @@ class SwitchFrame(Tk):
 class Frame1(Frame):
     def __init__ (self, master):
         Frame.__init__ (self, master)
-        self.frame_1 = WelcomeWindow(self) 
+        self.frame_1 = WelcomeWindow(self)
+        self.student = None 
         #Submit button
         self.submit_bttn = Button(self.frame_1, 
                                   text="Submit", 
                                   command=self.submitted, 
-                                  highlightbackground="orange"
+                                  highlightbackground="#002a52",
+                                  background="#002a52", #navy blue
+                                  fg="white"
                                   )
         self.submit_bttn.grid(column=1, 
                               columnspan=2, 
@@ -42,8 +45,7 @@ class Frame1(Frame):
                               )
         self.next = Button(self.frame_1, text="LET'S START!", 
                             command=lambda: master.switch_frame(Frame2),
-                            highlightbackground="orange", 
-                            activebackground="yellow")
+                            highlightbackground="#002a52")
         
 
     #Actual submit function is in WelcomeWindow
@@ -62,31 +64,42 @@ class Frame1(Frame):
 class Frame2(Frame):
     def __init__ (self, master):
         Frame.__init__ (self, master)
+        if Student.attr_list[2] == 'Easy':
+            self.frame_2 = ExerciseWindow(self, QuestionGenerator.easy)
+        if Student.attr_list[2] == 'Kinda easy':
+            self.frame_2 = ExerciseWindow(self, QuestionGenerator.medium)
+        if Student.attr_list[2] == 'Not so easy':
+            self.frame_2 = ExerciseWindow(self, QuestionGenerator.hard)
 
-        self.frame_2 = ExerciseWindow(self)
-        self.subframe_2 = SideBar(self, "Star is here to help you!")
         #Same function as Frame1's button
         self.done_bttn = Button(self.frame_2, 
                                 text="DONE", 
                                 command=self.submitted,
-                                highlightbackground="orange")
-        self.done_bttn.grid(column=0, row=2,
+                                highlightbackground="#002a52",
+                                fg="white")
+        self.done_bttn.grid(column=0, row=6,
                             columnspan=2, 
                             ipadx=5,
                             ipady=5)
         self.next = Button(self.frame_2, text="YOUR SCORE!", highlightbackground="#D0F6FC",
+                            fg="white",
                             command=lambda: master.switch_frame(Frame3))
         self.frame_2.grid()
-        self.subframe_2.grid()
 
     def submitted(self):
         #for students to check progress when click done?
+        self.left = 10 - self.frame_2.i
+        self.error = Label(self, text=f"You have {self.left} questions left!", fg="red", background="#f0f0f0")
         if len(Student.attr_list) == 3:
-            self.q = 10 - self.frame_2.i
-            SideBar(self, f"You have {self.q} questions left!")
+            self.error.grid(column=0, row=5,
+                            columnspan=2, 
+                            ipadx=5,
+                            ipady=5)
+            if self.frame_2.submit():
+                self.error.destroy()
         elif len(Student.attr_list) == 4:
             self.done_bttn.destroy()
-            self.next.grid(column=0, row=2,
+            self.next.grid(column=0, row=5,
                            columnspan=2, 
                            ipadx=5,
                            ipady=5) 
@@ -94,14 +107,15 @@ class Frame2(Frame):
 class Frame3(Frame):
     def __init__(self, master):
         Frame.__init__(self, master, background="#f0f0f0")
-
         #frame
         self.frame_3 = ScoreboardWindow(self)
+        self.object = Student
+        self.object.class_obj(self)
         #buttons
-        self.b1 = Button(self.frame_3, text="Retry", highlightbackground="orange")
+        self.b1 = Button(self.frame_3, text="Retry", highlightbackground="#002a52")
         #Assign two functions to one button
         #Code ref: https://www.delftstack.com/howto/python-tkinter/how-to-bind-multiple-commands-to-tkinter-button/
-        self.b1['command'] = lambda:[Student.retry(), master.switch_frame(Frame2)]
+        self.b1['command'] = lambda:[self.object.retry(self), master.switch_frame(Frame2)]
         self.b1.grid(row=4, 
                      column=1, 
                      padx=(50,100),
@@ -109,35 +123,14 @@ class Frame3(Frame):
                      ipady=10,
                      pady=(0, 150))
 
-        self.b2 = Button(self.frame_3, text="New Player", highlightbackground="yellow")
-        self.b2['command'] = lambda: [Student.new_player(), master.switch_frame(Frame1)] #two combined commands in one button
+        self.b2 = Button(self.frame_3, text="New Player", highlightbackground="#002a52")
+        self.b2['command'] = lambda: [self.object.new_player(self), master.switch_frame(Frame1)] #two combined commands in one button
         self.b2.grid(row=4, 
                      column=3, 
                      padx=(0, 300),
                      ipadx=10,
                      ipady=10,
                      pady=(0, 150))
-
-    def retry(self):
-        '''New score will become the score in the object's attribute scr
-        Old score will not be erased from file'''
-        #New score is added with title "Second attempt"
-        #Code ref: https://www.programiz.com/python-programming/methods/list/pop 
-        Student.write_file(self.student)
-        self.retry_count = Student.retry_times
-        self.retry_count = self.retry_count + 1
-        self.score_2 = Student.attr_list.pop(3) #new score replaces old 
-        print(self.score_2)
-        print(len(Student.attr_list))
-        if len(Student.attr_list) == 4:
-            with open("students.txt", 'a', encoding = 'utf-8') as f: #file always closes even when operations unexpectedly fail
-                f.write(f"Attempt {self.retry_count}: {self.score}")
-    
-    def new_player(self):
-        #Only write to file if click new player
-        Student.write_file(self.student)
-        with open("students.txt", 'a', encoding = 'utf-8') as f: #file always closes even when operations unexpectedly fail
-            f.write(f"===========\n\n")
 
 if __name__ == "__main__":
     root = SwitchFrame()
