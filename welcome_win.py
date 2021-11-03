@@ -73,23 +73,8 @@ class WelcomeWindow(Frame):
     #   Error labels
     def errors(self, event=None):
         self.input_check = 1
-        self.err_message = 0
         #Drawing value from entry boxes
         #Checking for blanks
-        if self.sn.get() == '' or self.sn.get() == 'Tell us your name!':
-            self.err_1 = Label(self, text="Fill in your name!", fg="red", bg="#f0f0f0")
-            self.err_1.grid(column=0, columnspan=2,
-                       row=3, 
-                       padx=(200,0))
-            self.input_check = 0
-    
-        if self.yr.get() == '' or self.yr.get() == 'Your year level?':
-            self.err_2 = Label(self, text="Fill in your year level!", fg="red", bg="#f0f0f0")
-            self.err_2.grid(column=2, row=3,
-                            columnspan=2,
-                            padx=(10,250)
-                            )
-            self.input_check = 0
         
         #Invalids and boundaries - year level
         if CheckingInput.invalid == 2 and self.yr.get() != 'Your year level?' and self.yr.get() != '':
@@ -110,6 +95,21 @@ class WelcomeWindow(Frame):
                             columnspan=2,
                             padx=(10,150))
 
+        if self.sn.get() == '' or self.sn.get() == 'Tell us your name!':
+            self.err_1 = Label(self, text="Fill in your name!", fg="red", bg="#f0f0f0")
+            self.err_1.grid(column=0, columnspan=2,
+                       row=3, 
+                       padx=(200,0))
+            self.input_check = 0
+    
+        if self.yr.get() == '' or self.yr.get() == 'Your year level?':
+            self.err_2 = Label(self, text="Fill in your year level!", fg="red", bg="#f0f0f0")
+            self.err_2.grid(column=2, row=3,
+                            columnspan=2,
+                            padx=(10,250)
+                            )
+            self.input_check = 0
+
         if self.input_check == 0:
             CheckingInput.check = []
         elif self.input_check == 1 and CheckingInput.invalid == 0:
@@ -123,6 +123,10 @@ class WelcomeWindow(Frame):
             self.object.input_check()
             self.errors()
             return True
+        elif len(CheckingInput.check) < 3:
+            CheckingInput.check.extend([self.sn.get(), self.yr.get(), self.diff_lvl])
+            self.object.input_check()
+            self.errors()
         elif len(CheckingInput.check) > 3: 
             Label(self, text="Unknown error. Please exit programme and reopen it.", 
                   fg="red").grid(column=0, row=1)
